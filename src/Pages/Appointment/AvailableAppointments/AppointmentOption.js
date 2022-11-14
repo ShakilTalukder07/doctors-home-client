@@ -11,10 +11,12 @@ const AppointmentOption = ({ option, setTreatment }) => {
                 <p>{slots.length > 0 ? slots[0] : 'Try another day'}</p>
                 <p>{slots.length} {slots.length > 1 ? 'spaces' : 'space'} Available</p>
                 <div className="card-actions justify-center">
-                     {/* modal level */}
-                    <label 
-                    htmlFor="booking-modal" className="btn btn-accent text-white"
-                    onClick={ () => setTreatment(option) }
+                    {/* modal label to open the modal */}
+                    <label
+                        disabled = { slots.length === 0 }
+                        htmlFor="booking-modal"
+                        className="btn btn-accent text-white"
+                        onClick={() => setTreatment(option)}
                     >Book Appointment</label>
                 </div>
             </div>
