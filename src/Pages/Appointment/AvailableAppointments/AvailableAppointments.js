@@ -10,7 +10,7 @@ const AvailableAppointments = ({ selectDate }) => {
     const [treatment, setTreatment] = useState(null);  // declare state for modal 
 
     useEffect(() => {
-        fetch('appointmentOption.json')
+        fetch('http://localhost:5000/appointmentOption')
             .then(res => res.json())
             .then(data => setAppointmentOptions(data))
     }, [])
