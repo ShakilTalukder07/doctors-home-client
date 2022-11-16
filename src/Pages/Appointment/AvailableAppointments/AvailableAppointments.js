@@ -1,19 +1,28 @@
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import BookingModal from '../BookingModal/BookingModal';
 import AppointmentOption from './AppointmentOption';
 
 const AvailableAppointments = ({ selectDate }) => {
 
-    const [appointmentOptions, setAppointmentOptions] = useState([]);
+    // const [appointmentOptions, setAppointmentOptions] = useState([]);
 
     const [treatment, setTreatment] = useState(null);  // declare state for modal 
 
-    useEffect(() => {
-        fetch('http://localhost:5000/appointmentOption')
-            .then(res => res.json())
-            .then(data => setAppointmentOptions(data))
-    }, [])
+    // fetching data using tanstack query 
+    const {data:appointmentOptions = []} = useQuery({   // empty array or useLoading use korbo
+        queryKey: ['appointmentOption'],
+        queryFn: () =>  fetch('http://localhost:5000/appointmentOption')
+        .then(res => res.json())
+    })
+
+    //fetching data using useEffect
+    // useEffect(() => {
+    //     fetch('http://localhost:5000/appointmentOption')
+    //         .then(res => res.json())
+    //         .then(data => setAppointmentOptions(data))
+    // }, [])
 
     return (
         <section className='my-16'>
