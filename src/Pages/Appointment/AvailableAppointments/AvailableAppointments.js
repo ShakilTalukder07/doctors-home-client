@@ -9,12 +9,13 @@ const AvailableAppointments = ({ selectDate }) => {
     // const [appointmentOptions, setAppointmentOptions] = useState([]);
 
     const [treatment, setTreatment] = useState(null);  // declare state for modal 
+    const date = format(selectDate, 'PP')
 
     // fetching data using tanstack query 
-    const {data:appointmentOptions = []} = useQuery({   // empty array or useLoading use korbo
-        queryKey: ['appointmentOption'],
-        queryFn: () =>  fetch('http://localhost:5000/appointmentOption')
-        .then(res => res.json())
+    const { data: appointmentOptions = [] } = useQuery({   // empty array or useLoading use korbo
+        queryKey: ['appointmentOption', date],
+        queryFn: () => fetch(`http://localhost:5000/appointmentOption?date=${date}`)
+            .then(res => res.json())
     })
 
     //fetching data using useEffect
