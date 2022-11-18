@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
+import Loading from '../../Shared/Loading/Loading';
 import BookingModal from '../BookingModal/BookingModal';
 import AppointmentOption from './AppointmentOption';
 
@@ -12,11 +13,15 @@ const AvailableAppointments = ({ selectDate }) => {
     const date = format(selectDate, 'PP')
 
     // fetching data using tanstack query 
-    const { data: appointmentOptions = [] } = useQuery({   // empty array or useLoading use korbo
+    const { data: appointmentOptions = [], refetch, isLoading } = useQuery({   // empty array or useLoading use korbo
         queryKey: ['appointmentOption', date],
-        queryFn: () => fetch(`http://localhost:5000/appointmentOption?date=${date}`)
+        queryFn: () => fetch(`http://localhost:5000/v2/appointmentOption?date=${date}`)
             .then(res => res.json())
     })
+
+    if(isLoading){
+        <Loading></Loading>
+    }
 
     //fetching data using useEffect
     // useEffect(() => {
@@ -43,6 +48,7 @@ const AvailableAppointments = ({ selectDate }) => {
                     selectDate={selectDate}
                     treatment={treatment}
                     setTreatment={setTreatment}
+                    refetch={refetch}
                 ></BookingModal>
             }
         </section>

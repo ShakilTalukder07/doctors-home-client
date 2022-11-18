@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { toast } from 'react-hot-toast';
 import { AuthContext } from '../../../context/AuthProvider';
 
-const BookingModal = ({ treatment, setTreatment, selectDate }) => {
+const BookingModal = ({ treatment, setTreatment, selectDate, refetch }) => {
 
     const { name, slots } = treatment  // treatment is appointment option just different name
     const date = format(selectDate, 'PP')
@@ -14,7 +14,7 @@ const BookingModal = ({ treatment, setTreatment, selectDate }) => {
         event.preventDefault();
         const form = event.target;
         const slot = form.slot.value;
-        const name = form.name.value;
+        const patientName = form.name.value;
         const email = form.email.value;
         const phone = form.phone.value;
 
@@ -22,14 +22,16 @@ const BookingModal = ({ treatment, setTreatment, selectDate }) => {
             appointmentDate: date,
             treatment: name,
             slot,  // if name and value are same we can only write the value
-            patient: name,
+            patient: patientName,
             email,
             phone
         }
+        console.log(booking);
 
         // TODO : send data to the server 
         // and once data is saved then closed the modal 
         // add display a success toast 
+        
         fetch('http://localhost:5000/bookings', {
             method: 'POST',
             headers: {
@@ -40,9 +42,12 @@ const BookingModal = ({ treatment, setTreatment, selectDate }) => {
             .then(res => res.json())
             .then(data => {
                 console.log(data)
-                if(data.acknowledged){
+                if (data.acknowledged) {
                     setTreatment(null)
-                toast.success('Booking Confirmed')
+                    toast.success('Booking Confirmed')
+                    refetch();
+                }else{
+                    toast.error(data.message)
                 }
             })
     }
@@ -60,7 +65,7 @@ const BookingModal = ({ treatment, setTreatment, selectDate }) => {
                             {
                                 slots.map((slot, index) => <option
                                     value={slot}
-                                    key={index}
+                                    key={index} //if we don't have a unique key, we can use this
                                 > {slot} </option>)
                             }
                         </select>
