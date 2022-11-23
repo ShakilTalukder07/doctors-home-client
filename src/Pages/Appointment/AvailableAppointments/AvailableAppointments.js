@@ -15,17 +15,17 @@ const AvailableAppointments = ({ selectDate }) => {
     // fetching data using tanstack query 
     const { data: appointmentOptions = [], refetch, isLoading } = useQuery({   // empty array or useLoading use korbo
         queryKey: ['appointmentOption', date],
-        queryFn: () => fetch(`http://localhost:5000/v2/appointmentOption?date=${date}`)
+        queryFn: () => fetch(`https://doctors-home-server.vercel.app/v2/appointmentOption?date=${date}`)
             .then(res => res.json())
     })
 
-    if(isLoading){
+    if (isLoading) {
         <Loading></Loading>
     }
 
     //fetching data using useEffect
     // useEffect(() => {
-    //     fetch('http://localhost:5000/appointmentOption')
+    //     fetch('https://doctors-home-server.vercel.app/appointmentOption')
     //         .then(res => res.json())
     //         .then(data => setAppointmentOptions(data))
     // }, [])

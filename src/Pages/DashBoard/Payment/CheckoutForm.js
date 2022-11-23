@@ -2,20 +2,24 @@ import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import React, { useEffect, useState } from 'react';
 
 
+
 // follow this site 
 // https://github.com/stripe/react-stripe-js/blob/master/examples/hooks/0-Card-Minimal.js
 const CheckoutForm = ({ booking }) => {
-    const [isLoading, setIsLoading] = useState(false);
+    const [Processing, setProcessing] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [transactionId, setTransactionId] = useState(false);
     const [clientSecret, setClientSecret] = useState("");
     const [cardError, setCardError] = useState('')
     const stripe = useStripe()
     const elements = useElements()
-    const { price, email, patient } = booking
 
+
+    const { price, email, patient, _id } = booking
 
     useEffect(() => {
         // Create PaymentIntent as soon as the page loads
-        fetch("http://localhost:5000/create-payment-intent", {
+        fetch("https://doctors-home-server.vercel.app/create-payment-intent", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -34,7 +38,7 @@ const CheckoutForm = ({ booking }) => {
             return
         }
 
-        setIsLoading(true);
+        setProcessing(true);
 
         const card = elements.getElement(CardElement);
 
@@ -42,7 +46,7 @@ const CheckoutForm = ({ booking }) => {
             return;
         };
 
-        const { error, paymentMethod } = await stripe.createPaymentMethod({
+        const { error } = await stripe.createPaymentMethod({
             type: 'card',
             card,
         });
@@ -52,10 +56,8 @@ const CheckoutForm = ({ booking }) => {
         } else {
             setCardError('')
         }
-
-        setIsLoading(false)
-
-
+        setSuccess('')
+        setProcessing(true)
         const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
             clientSecret,
             {
@@ -68,12 +70,37 @@ const CheckoutForm = ({ booking }) => {
                 }
             }
         );
-
         if (confirmError) {
             setCardError(confirmError.message)
             return;
         }
+        if (paymentIntent.status === "succeeded") {
+            // store payment info in the database
+            const payment = {
+                price,
+                transactionId: paymentIntent.id,
+                email,
+                bookingId: _id
+            }
+            // console.log(payment);
 
+            fetch("https://doctors-home-server.vercel.app/payments", {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    authorization: `bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify(payment)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.insertedId) {
+                        setSuccess('Congrats! your payment completed');
+                        setTransactionId(paymentIntent.id)
+                    }
+                })
+        }
+        setProcessing(false)
     }
 
     return (
@@ -98,11 +125,17 @@ const CheckoutForm = ({ booking }) => {
                 <button
                     className='btn btn-sm mt-4 btn-accent'
                     type="submit"
-                    disabled={!stripe || !clientSecret}>
+                    disabled={!stripe || !clientSecret || Processing}>
                     Pay
                 </button>
             </form>
-            <div className="text-xl text-red-500">{cardError}</div>
+            <p className="text-xl text-red-500">{cardError}</p>
+            {
+                success && <div>
+                    <p className="text-green-600">{success}</p>
+                    <p>Your transactionId: <span className='font-bold'>{transactionId}</span></p>
+                </div>
+            }
         </>
     );
 };

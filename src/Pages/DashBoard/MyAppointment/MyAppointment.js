@@ -6,10 +6,10 @@ import { AuthContext } from '../../../context/AuthProvider';
 const MyAppointment = () => {
     const { user } = useContext(AuthContext)
 
-    const url = `http://localhost:5000/bookings?email=${user?.email}`;
+    const url = `https://doctors-home-server.vercel.app/bookings?email=${user?.email}`;
 
     const { data: bookings = [] } = useQuery({
-        
+
         queryKey: ['bookings', user?.email],
         queryFn: async () => {
             const res = await fetch(url, {
@@ -59,7 +59,7 @@ const MyAppointment = () => {
                                         </Link>
                                     }
                                     {
-                                        booking.price && booking.paid && <span className='btn-accent'>Paid</span>
+                                        booking.price && booking.paid && <span className='text-green-600'>Paid</span>
                                     }
                                 </td>
                             </tr>)
