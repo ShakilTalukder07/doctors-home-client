@@ -23,12 +23,6 @@ const AvailableAppointments = ({ selectDate }) => {
         <Loading></Loading>
     }
 
-    //fetching data using useEffect
-    // useEffect(() => {
-    //     fetch('https://doctors-home-server.vercel.app/appointmentOption')
-    //         .then(res => res.json())
-    //         .then(data => setAppointmentOptions(data))
-    // }, [])
 
     return (
         <section className='my-16'>
